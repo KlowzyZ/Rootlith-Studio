@@ -18,7 +18,8 @@
     "lint": "eslint .",
     "notices": "node scripts/generate-notices.mjs",
     "assets:icons": "node scripts/generate-brand-icons.mjs",
-    "verify:identity": "node scripts/verify-preview-identity.mjs"
+    "verify:identity": "node scripts/verify-preview-identity.mjs",
+    "audit:deps": "node scripts/dependency-audit.mjs"
   },
   "build": {
     "appId": "org.klowzy.fixflowstudio",
