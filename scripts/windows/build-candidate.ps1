@@ -4,7 +4,8 @@ $ErrorActionPreference = 'Stop'
 if ($env:OS -ne 'Windows_NT') { throw 'Native Windows required' }
 $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Use a standard, non-elevated account' }
-if ((node -p 'process.versions.node.split(".")[0]') -ne '24') { throw 'Node.js 24 required' }
+$nodeVersion = & node --version
+if ($LASTEXITCODE -ne 0 -or $nodeVersion -notmatch '^v24\.') { throw 'Node.js 24 required' }
 if (git status --porcelain) { throw 'Build only a clean committed checkout' }
 if (Test-Path release) { throw 'Use a fresh checkout without release/ to avoid stale candidates' }
 New-Item -ItemType Directory -Path $EvidenceDirectory -ErrorAction Stop | Out-Null
