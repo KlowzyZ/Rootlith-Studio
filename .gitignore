@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-electron/
+release/
+test-results/
+playwright-report/
+*.log
+.env*
+build/x86-unicode/
+build/legal/
+baseline/
+baseline-run.json

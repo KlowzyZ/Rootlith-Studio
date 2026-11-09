@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "id": "c07bb6be-93e0-438d-a810-aa9c0202162f",
+  "name": "Local Development Server",
+  "version": "1.0.0",
+  "description": "Follow the evidence from your local port to the HTTP service.",
+  "author": "KLOWZY",
+  "category": "Networking",
+  "tags": [
+    "network",
+    "starter"
+  ],
+  "requiredCapabilities": [
+    "tcp",
+    "http"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "kind": "start",
+      "label": "Begin diagnosis",
+      "position": {
+        "x": 300,
+        "y": 0
+      },
+      "description": "Read-only checks. You approve every network target before starting.",
+      "config": {
+        "timeout": 3000
+      }
+    },
+    {
+      "id": "condition",
+      "kind": "condition",
+      "label": "Did the port accept a connection?",
+      "position": {
+        "x": 300,
+        "y": 245
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000,
+        "source": "tcp",
+        "field": "ok",
+        "operator": "equals",
+        "value": true
+      }
+    },
+    {
+      "id": "tcp",
+      "kind": "tcp",
+      "label": "Test connection",
+      "position": {
+        "x": 300,
+        "y": 120
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000,
+        "host": "localhost",
+        "port": 3000
+      }
+    },
+    {
+      "id": "http",
+      "kind": "http",
+      "label": "Check HTTP response",
+      "position": {
+        "x": 300,
+        "y": 380
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000,
+        "url": "http://localhost:3000"
+      }
+    },
+    {
+      "id": "guidance",
+      "kind": "result",
+      "label": "Check the local service",
+      "position": {
+        "x": 660,
+        "y": 380
+      },
+      "description": "The service may not be listening on this host and port. Check your development server output and configured port. No process inspection or firewall changes were performed.",
+      "config": {
+        "timeout": 3000
+      }
+    },
+    {
+      "id": "end",
+      "kind": "end",
+      "label": "Diagnostic complete",
+      "position": {
+        "x": 300,
+        "y": 520
+      },
+      "description": "Review the individual findings. Reachability alone does not confirm the service is healthy.",
+      "config": {
+        "timeout": 3000
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "source": "start",
+      "target": "tcp"
+    },
+    {
+      "id": "e1",
+      "source": "tcp",
+      "target": "condition"
+    },
+    {
+      "id": "e2",
+      "source": "condition",
+      "target": "http",
+      "branch": "true"
+    },
+    {
+      "id": "e3",
+      "source": "condition",
+      "target": "guidance",
+      "branch": "false"
+    },
+    {
+      "id": "e4",
+      "source": "http",
+      "target": "end"
+    },
+    {
+      "id": "e5",
+      "source": "guidance",
+      "target": "end"
+    }
+  ]
+}

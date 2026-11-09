@@ -1,0 +1,41 @@
+import {
+  Play,
+  Square,
+  Network,
+  Globe,
+  ArrowLeftRight,
+  HelpCircle,
+  GitBranch,
+  FileText,
+  CheckCheck,
+  MousePointer2,
+} from "lucide-react";
+import type { FlowNode } from "../schemas";
+export const labels: Record<FlowNode["kind"], string> = {
+  start: "Start",
+  end: "End",
+  instruction: "Instruction",
+  question: "Yes / No question",
+  condition: "Condition",
+  result: "Result",
+  interfaces: "Network interfaces",
+  dns: "DNS lookup",
+  tcp: "TCP connectivity",
+  http: "HTTP reachability",
+  choice: "Multiple choice",
+  confirmation: "User confirmation",
+};
+export const icons = {
+  start: Play,
+  end: Square,
+  instruction: FileText,
+  question: HelpCircle,
+  condition: GitBranch,
+  result: CheckCheck,
+  interfaces: Network,
+  dns: Globe,
+  tcp: ArrowLeftRight,
+  http: Globe,
+  choice: MousePointer2,
+  confirmation: CheckCheck,
+};

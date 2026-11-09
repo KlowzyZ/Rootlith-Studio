@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "id": "c714c532-16cf-4b11-8886-3475efe69dcd",
+  "name": "Internet Connection",
+  "version": "1.0.0",
+  "description": "A guided playbook for investigating your network connection.",
+  "author": "KLOWZY",
+  "category": "Networking",
+  "tags": [
+    "network",
+    "starter"
+  ],
+  "requiredCapabilities": [
+    "interfaces",
+    "dns",
+    "tcp",
+    "http"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "kind": "start",
+      "label": "Begin diagnosis",
+      "position": {
+        "x": 300,
+        "y": 0
+      },
+      "description": "Read-only checks. You approve every network target before starting.",
+      "config": {
+        "timeout": 3000
+      }
+    },
+    {
+      "id": "interfaces",
+      "kind": "interfaces",
+      "label": "Inspect network adapters",
+      "position": {
+        "x": 300,
+        "y": 100
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000
+      }
+    },
+    {
+      "id": "question",
+      "kind": "question",
+      "label": "Are you connected?",
+      "position": {
+        "x": 300,
+        "y": 205
+      },
+      "description": "Check your Wi-Fi or Ethernet connection before continuing.",
+      "config": {
+        "timeout": 3000
+      }
+    },
+    {
+      "id": "dns",
+      "kind": "dns",
+      "label": "Resolve hostname",
+      "position": {
+        "x": 300,
+        "y": 320
+      },
+      "description": "Resolve the configured hostname into network addresses.",
+      "config": {
+        "timeout": 3000,
+        "host": "example.com"
+      }
+    },
+    {
+      "id": "condition",
+      "kind": "condition",
+      "label": "Did DNS resolve?",
+      "position": {
+        "x": 300,
+        "y": 430
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000,
+        "source": "dns",
+        "field": "ok",
+        "operator": "equals",
+        "value": true
+      }
+    },
+    {
+      "id": "tcp",
+      "kind": "tcp",
+      "label": "Test connection",
+      "position": {
+        "x": 300,
+        "y": 540
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000,
+        "host": "example.com",
+        "port": 443
+      }
+    },
+    {
+      "id": "http",
+      "kind": "http",
+      "label": "Check HTTP response",
+      "position": {
+        "x": 300,
+        "y": 650
+      },
+      "description": "",
+      "config": {
+        "timeout": 3000,
+        "url": "https://example.com"
+      }
+    },
+    {
+      "id": "guidance",
+      "kind": "result",
+      "label": "Review your connection",
+      "position": {
+        "x": 660,
+        "y": 320
+      },
+      "description": "A disconnected adapter or failed name resolution may explain this result. Check your connection and DNS settings, then rerun. No settings were changed.",
+      "config": {
+        "timeout": 3000
+      }
+    },
+    {
+      "id": "end",
+      "kind": "end",
+      "label": "Diagnostic complete",
+      "position": {
+        "x": 300,
+        "y": 765
+      },
+      "description": "Review the individual findings. Reachability alone does not confirm the service is healthy.",
+      "config": {
+        "timeout": 3000
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "source": "start",
+      "target": "interfaces"
+    },
+    {
+      "id": "e1",
+      "source": "interfaces",
+      "target": "question"
+    },
+    {
+      "id": "e2",
+      "source": "question",
+      "target": "dns",
+      "branch": "true"
+    },
+    {
+      "id": "e3",
+      "source": "question",
+      "target": "guidance",
+      "branch": "false"
+    },
+    {
+      "id": "e4",
+      "source": "dns",
+      "target": "condition"
+    },
+    {
+      "id": "e5",
+      "source": "condition",
+      "target": "tcp",
+      "branch": "true"
+    },
+    {
+      "id": "e6",
+      "source": "condition",
+      "target": "guidance",
+      "branch": "false"
+    },
+    {
+      "id": "e7",
+      "source": "tcp",
+      "target": "http"
+    },
+    {
+      "id": "e8",
+      "source": "http",
+      "target": "end"
+    },
+    {
+      "id": "e9",
+      "source": "guidance",
+      "target": "end"
+    }
+  ]
+}

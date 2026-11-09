@@ -1,0 +1,5 @@
+LIBRARY FixFlowShell
+EXPORTS
+  SetLnkAUMI
+  UninstAppUserModelId
+  UninstShortcut

@@ -1,0 +1,104 @@
+{
+  "name": "fixflow-studio",
+  "version": "0.13.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "description": "Rootlith Studio: visual, safe, shareable troubleshooting",
+  "author": "KLOWZY",
+  "license": "MIT",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build && node scripts/build-desktop.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:ui": "playwright test",
+    "desktop": "npm run build && electron .",
+    "package:win": "npm run build && powershell -NoProfile -File scripts/build-shell-plugin.ps1 && node scripts/prepare-nsis.mjs && node scripts/prepare-legal.mjs && electron-builder --win --x64 --publish never",
+    "lint": "eslint .",
+    "notices": "node scripts/generate-notices.mjs",
+    "assets:icons": "node scripts/generate-brand-icons.mjs",
+    "verify:identity": "node scripts/verify-preview-identity.mjs"
+  },
+  "build": {
+    "appId": "org.klowzy.fixflowstudio",
+    "productName": "FixFlow Studio",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "package.json",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "PACKAGING_NOTICES.md",
+      "licenses/packaging/**"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "artifactName": "Rootlith-Studio-${version}-${arch}-setup.${ext}",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "artifactName": "Rootlith-Studio-${version}-${arch}-setup.${ext}",
+      "packElevateHelper": false,
+      "include": "build/installer.nsh",
+      "guid": "c41b684f-fd57-5c09-b4a7-68101139f192",
+      "shortcutName": "Rootlith Studio",
+      "uninstallDisplayName": "Rootlith Studio ${version}",
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "Rootlith-Studio-${version}-${arch}-portable.exe"
+    },
+    "toolsets": {
+      "nsis": "1.2.1"
+    },
+    "extraResources": [
+      {
+        "from": "build/legal",
+        "to": "legal"
+      }
+    ]
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.12.1",
+    "lucide-react": "^1.66.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KlowzyZ/Rootlith-Studio.git"
+  },
+  "homepage": "https://klowzy.com"
+}

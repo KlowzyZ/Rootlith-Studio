@@ -1,0 +1,6 @@
+# Preserve the exact upstream license bytes and their recorded SHA-256 hashes.
+licenses/packaging/*.txt -text -whitespace
+# Original SVG source hashes must survive Windows checkout unchanged.
+*.svg text eol=lf
+*.ico binary
+*.png binary

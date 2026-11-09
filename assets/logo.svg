@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 144" role="img" aria-labelledby="title desc">
+  <title id="title">Rootlith Studio</title>
+  <desc id="desc">Original branching-stone emblem with a system-font wordmark. Rootlith Studio private preview.</desc>
+  <g transform="translate(16 24)" fill="none">
+    <path d="M48 6 80 24 86 62 58 88 20 76 10 38Z" fill="#172522" stroke="#92D8B6" stroke-width="3" stroke-linejoin="round"/>
+    <path d="m48 6 10 82M10 38l48 18 28 6M80 24 58 56 20 76" stroke="#92D8B6" stroke-opacity=".18" stroke-width="2"/>
+    <path d="M35 29h17a10 10 0 0 1 0 20H38v17m0-17 25 19" stroke="#BCF1D4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#BCF1D4"><circle cx="35" cy="29" r="4"/><circle cx="38" cy="68" r="4"/><circle cx="64" cy="69" r="4"/></g>
+  </g>
+  <text x="136" y="78" fill="#E9EFEC" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="43" font-weight="600" letter-spacing="-1.4">Rootlith <tspan fill="#A3B7AE" font-weight="400">Studio</tspan></text>
+  <text x="138" y="105" fill="#A3B7AE" font-family="Segoe UI, system-ui, sans-serif" font-size="12" letter-spacing="2.1">FOLLOW THE EVIDENCE.</text>
+</svg>

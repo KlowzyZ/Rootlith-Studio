@@ -1,0 +1,19 @@
+{
+  "source": "assets/mark.svg",
+  "generator": "scripts/generate-brand-icons.mjs",
+  "chromiumVersion": "156.0.8078.4",
+  "sourceSha256": "02695e827c775d4f682ab758396430db5d5f7057fc93e814a1262702bd533da0",
+  "sizes": [
+    16,
+    24,
+    32,
+    48,
+    64,
+    128,
+    256
+  ],
+  "icoSha256": "fbcb429a23f3a4952a3fbf8adc0325ef6cf8aca7d747066b9f31086241cdf174",
+  "pngSha256": "4bcf35b96acd2d429e1def72445baee7112484ad428e14db1d596f2fd1ba284c",
+  "originalProjectArtwork": true,
+  "externalAssets": false
+}

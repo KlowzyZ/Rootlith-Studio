@@ -1,0 +1,36 @@
+{
+  "nsisToolset": "1.2.1",
+  "nsisVersion": "3.12",
+  "archives": [
+    {
+      "file": "nsis-v312-source.tar.gz",
+      "url": "https://codeload.github.com/NSIS-Dev/nsis/tar.gz/refs/tags/v312",
+      "sha256": "5ee95daa11e3c3a40581cf9824598b5871048942d0ed802561c321621624fe8e",
+      "bytes": 1847713
+    },
+    {
+      "file": "StdUtils-1.14-source.zip",
+      "url": "https://codeload.github.com/lordmulder/stdutils/zip/4e1117321001e54dcd2c52f72d3c359d5215e426",
+      "sha256": "d97ccc591bea342aa0fce169ec1c6935f17e44c04e215c091e86f1d5ca640d48",
+      "bytes": 295915
+    },
+    {
+      "file": "Nsis7z_19.00.7z",
+      "url": "https://nsis.sourceforge.io/mediawiki/images/6/69/Nsis7z_19.00.7z",
+      "sha256": "6f2f3730049926f40442ee0c8b7d3e3dee7ace544d82467ff8059ea3f4201c58",
+      "bytes": 461078
+    },
+    {
+      "file": "lzma1900.7z",
+      "url": "https://www.7-zip.org/a/lzma1900.7z",
+      "sha256": "00f569e624b3d9ed89cf8d40136662c4c5207eaceb92a70b1044c77f84234bad",
+      "bytes": 1082692
+    },
+    {
+      "file": "UAC.zip",
+      "url": "https://nsis.sourceforge.io/mediawiki/images/8/8f/UAC.zip",
+      "sha256": "20e3192af5598568887c16d88de59a52c2ce4a26e42c5fb8bee8105dcbbd1760",
+      "bytes": 52034
+    }
+  ]
+}

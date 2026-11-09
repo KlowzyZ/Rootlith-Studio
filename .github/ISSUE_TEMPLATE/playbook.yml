@@ -1,0 +1,23 @@
+name: Playbook proposal
+description: Propose a small, safe and reusable troubleshooting workflow.
+title: "[Playbook] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Investigation and audience
+      description: What question will this playbook help someone answer?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Checks, targets and limitations
+      description: Use loopback or documentation domains. Never include private environments or credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation evidence
+      description: Distinguish browser simulation from actual native execution, including cancellation and failed checks.

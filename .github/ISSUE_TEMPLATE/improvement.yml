@@ -1,0 +1,15 @@
+name: Focused improvement
+description: Describe a concrete usability or reliability problem.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem in the current product
+      description: Describe the task, current friction and expected benefit. Do not include sensitive diagnostic data.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Smallest useful change
+      description: Include relevant alternatives and accessibility needs. Large feature proposals should be discussed before implementation.

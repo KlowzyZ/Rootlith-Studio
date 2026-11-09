@@ -1,0 +1,56 @@
+{
+  "reviewed": "2026-11-02",
+  "status": "Packaging revision 1: WinShell excluded; matching component source and notices delivered in resources/legal. Windows validation is recorded separately.",
+  "files": [
+    {
+      "file": "StdUtils-LGPL.txt",
+      "url": "https://github.com/lordmulder/stdutils/blob/4e1117321001e54dcd2c52f72d3c359d5215e426/LGPL.txt",
+      "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551"
+    },
+    {
+      "file": "StdUtils-LGPL_CLARIFICATION.txt",
+      "url": "https://github.com/lordmulder/stdutils/blob/4e1117321001e54dcd2c52f72d3c359d5215e426/LGPL_CLARIFICATION.txt",
+      "sha256": "49287ffa37d51910a8cb595d7ab64ebd2d42525384b16d4322783a0e57a77194"
+    },
+    {
+      "file": "StdUtils-Contrib-StdUtils-src-rhash-COPYING.txt",
+      "url": "https://github.com/lordmulder/stdutils/blob/4e1117321001e54dcd2c52f72d3c359d5215e426/Contrib/StdUtils/src/rhash/COPYING.txt",
+      "sha256": "8cf876d3406a2eed6c17ae804c8958bd78d3a0f63c30d6e2e789ab575e9fde40"
+    },
+    {
+      "file": "StdUtils-Contrib-StdUtils-src-blake2-COPYING.txt",
+      "url": "https://github.com/lordmulder/stdutils/blob/4e1117321001e54dcd2c52f72d3c359d5215e426/Contrib/StdUtils/src/blake2/COPYING.txt",
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    },
+    {
+      "file": "NSIS-COPYING.txt",
+      "source": "Historical NSIS 3.0.4.1 terms, retained for original private candidate; revision 1 uses NSIS-3.12-COPYING.txt",
+      "sha256": "3c8de989f6504d52f5f8dfafedb6668cd47201f5d01f1319570727c091425dd6"
+    },
+    {
+      "file": "nsis7z-License.txt",
+      "source": "Nsis7z_19.00.7z / Contrib/nsis7z/DOC/License.txt",
+      "sha256": "63fcfe54826809b5a9f9df8a8ff53c04330122319ec67a2dd815085586adaf0e"
+    },
+    {
+      "file": "nsis7z-Readme.txt",
+      "source": "Nsis7z_19.00.7z / Contrib/nsis7z/DOC/nsis7z.txt",
+      "sha256": "881f8ba4da0a0c30e281d324408baa596f14211b03d1f3bf99fe18c4621916c3"
+    },
+    {
+      "file": "UAC-License.txt",
+      "source": "UAC.zip / License.txt",
+      "sha256": "997fd014643f27a2f240faf9b9b54a98371775c63eb38134829154794f7326fa"
+    },
+    {
+      "file": "NSIS-3.12-COPYING.txt",
+      "source": "Pinned NSIS toolset 1.2.1 / nsis-bundle-3.12.tar.gz / LICENSE",
+      "sha256": "6cc665347be5c84b76bf0fd6f85fbb0c33261e89b3408aa3e3e55dbe95e12d89"
+    },
+    {
+      "file": "electron-builder-MIT.txt",
+      "source": "Locked electron-builder 26.18.0 npm package / LICENSE",
+      "sha256": "bed8d0ab3e6031817f775a641ff37313b0f5591bc8ba0ed79b978dafbd4231ce"
+    }
+  ]
+}
