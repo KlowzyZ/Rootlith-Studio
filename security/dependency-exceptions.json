@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "exceptions": [
+    {
+      "advisory": "GHSA-g3hv-75wg-m249",
+      "package": "minimatch",
+      "scope": "development",
+      "reviewed": "2026-11-09",
+      "reviewBy": "2027-01-31",
+      "reason": "CVE-2026-118764 (moderate). The globParts amplification is in Minimatch firstPhasePreProcess, reached only with optimizationLevel >= 2 on an attacker-supplied pattern. Affected copies are dev-only: 10.2.6 (eslint, @eslint/config-array, @typescript-eslint/typescript-estree, app-builder-lib) and 9.0.9 (@electron/universal 2.0.3). Each call site uses the default optimizationLevel 1 and patterns from repository-owned configuration (eslint.config.js, package.json build.files). minimatch is not bundled into dist/ or dist-electron/. The only fix is minimatch 11.x, which removes makeRe, Minimatch#regexp, matchOne and the AST class and changes trailing-portion and Windows '..' matching. Every current parent declares ^9 or ^10, and app-builder-lib pins @electron/universal 2.0.3 exactly, so an override would be an unverified cross-major change to Windows asar file selection.",
+      "exitCriteria": "Remove this exception when eslint, @eslint/config-array, @typescript-eslint/typescript-estree and app-builder-lib accept minimatch >=11.0.1 and app-builder-lib accepts @electron/universal >=3.0.4, which has no minimatch dependency. Then update them normally and verify with npm run package:win on Windows. Re-review earlier if any vulnerable copy becomes a production dependency or a consumer starts passing optimizationLevel >= 2."
+    }
+  ]
+}
