@@ -14,12 +14,13 @@
     "test": "vitest run",
     "test:ui": "playwright test",
     "desktop": "npm run build && electron .",
-    "package:win": "npm run build && powershell -NoProfile -File scripts/build-shell-plugin.ps1 && node scripts/prepare-nsis.mjs && node scripts/prepare-legal.mjs && electron-builder --win --x64 --publish never",
+    "package:win": "npm run build && powershell -NoProfile -File scripts/build-shell-plugin.ps1 && node scripts/prepare-nsis.mjs && node scripts/prepare-legal.mjs && electron-builder --win --x64 --publish never && npm run verify:package:win",
     "lint": "eslint .",
     "notices": "node scripts/generate-notices.mjs",
     "assets:icons": "node scripts/generate-brand-icons.mjs",
     "verify:identity": "node scripts/verify-preview-identity.mjs",
-    "audit:deps": "node scripts/dependency-audit.mjs"
+    "audit:deps": "node scripts/dependency-audit.mjs",
+    "verify:package:win": "node scripts/verify-windows-package.mjs"
   },
   "build": {
     "appId": "org.klowzy.fixflowstudio",
