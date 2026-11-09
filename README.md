@@ -62,7 +62,7 @@ flowchart LR
 - **Honest limits:** a read-only request can still be logged, consume resources, or interact with a sensitive service. Only investigate systems you own or are authorized to test.
 
 > [!IMPORTANT]
-> **Current release state: v0.13.0-alpha.1 source preview.** This repository is intended for collaboration and review. It does **not** yet provide a publicly validated Windows Installer or Portable release. Linux/browser build success does not establish Windows-native upgrade or packaging safety. The manual update feature is not yet a public download channel.
+> **Current release state: v0.13.0-alpha.1 source preview.** This repository is intended for collaboration and review. It does **not** yet provide a publicly validated Windows Installer or Portable release. Linux/browser build success does not establish Windows-native upgrade or packaging safety. Automatic and manual public release checks are available in Electron Settings. Executable download/install stays disabled until publisher signing and native Windows upgrade validation are established; see [Updates](docs/updates.md).
 
 ## 🚀 Quick start
 

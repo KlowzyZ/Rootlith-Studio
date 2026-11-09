@@ -3,7 +3,7 @@ export const repositoryNames = ["KlowzyZ/Rootlith-Studio"] as const;
 export const currentRepository = repositoryNames[0];
 export const websiteUrl = "https://klowzy.com/";
 export const repositoryUrl = `https://github.com/${currentRepository}`;
-export type OfficialLink = "website" | "repository" | "release";
+export type OfficialLink = "website" | "repository" | "releases" | "release";
 export function isOfficialReleaseUrl(value: string): boolean {
   if (value.length > 256) return false;
   try {
@@ -29,6 +29,7 @@ export function isOfficialReleaseUrl(value: string): boolean {
 export function officialLink(kind: unknown, verifiedRelease?: string): string {
   if (kind === "website") return websiteUrl;
   if (kind === "repository") return repositoryUrl;
+  if (kind === "releases") return `${repositoryUrl}/releases`;
   if (
     kind === "release" &&
     verifiedRelease &&

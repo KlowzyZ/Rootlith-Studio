@@ -1,0 +1,21 @@
+name: Source release readiness
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run verify:identity
+      - run: npm test -- tests/updates.test.ts tests/update-background.test.ts tests/update-state.test.ts
+      - name: State delivery gate honestly
+        run: echo 'Source checks only. Publisher signing and native Windows upgrade validation are required before binary delivery. See docs/updates.md.'
