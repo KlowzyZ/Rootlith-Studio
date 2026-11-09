@@ -1,7 +1,9 @@
 // Copyright (c) 2026 KLOWZY. SPDX-License-Identifier: MIT
-import { readFile, mkdir, writeFile, cp } from "node:fs/promises";
+import { readFile, mkdir, writeFile, cp, rm } from "node:fs/promises";
 import { createHash } from "node:crypto";
 const manifest = JSON.parse(await readFile("build/packaging-sources.json", "utf8"));
+// Never carry stale or unreviewed files from a previous preparation into a candidate.
+await rm("build/legal", { recursive: true, force: true });
 await mkdir("build/legal/sources", { recursive: true });
 for (const item of manifest.archives) {
   const response = await fetch(item.url, { signal: AbortSignal.timeout(60000) });
