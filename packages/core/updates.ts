@@ -64,23 +64,41 @@ export function compareVersions(left: string, right: string): number {
 export type ReleaseProvider =
   | { kind: "private-preview" }
   | { kind: "public-github"; repository: (typeof repositoryNames)[number] };
-// No public preview manifest exists. Enabling public delivery requires a reviewed configuration change.
-export const officialProvider: ReleaseProvider = { kind: "private-preview" };
+// Discovery only. Publisher-authenticated executable delivery is a separate gate.
+export const officialProvider: ReleaseProvider = {
+  kind: "public-github",
+  repository: repositoryNames[0],
+};
 export type ReleaseInfo = {
   version: string;
   name: string;
   url: string;
   publishedAt: string;
+  notes: string;
 };
 export type UpdateStatus = {
   state:
-    "idle" | "available" | "up-to-date" | "unavailable" | "error" | "offline";
+    | "idle"
+    | "checking"
+    | "available"
+    | "up-to-date"
+    | "unavailable"
+    | "error"
+    | "offline";
+  automatic: boolean;
+  includePreviews: boolean;
+  retryAt?: string;
+  persistenceError?: string;
+  cached?: boolean;
   installedVersion: string;
   channel: string;
   message: string;
   lastSuccess?: string;
   release?: ReleaseInfo;
+  delivery: "blocked";
+  deliveryReason: string;
   runtime?: {
+    distribution: "source" | "portable" | "packaged-unverified";
     platform: string;
     arch: string;
     electron: string;
@@ -168,11 +186,14 @@ function releases(input: unknown): ReleaseInfo[] {
     );
     if (tag !== r.tag_name)
       throw Error("Official release tag does not match its page.");
+    if (r.body !== undefined && r.body !== null && typeof r.body !== "string")
+      throw Error("Official release notes are malformed.");
     result.push({
       version,
       name: r.name || r.tag_name,
       url: r.html_url,
       publishedAt: r.published_at,
+      notes: typeof r.body === "string" ? r.body.slice(0, 12000) : "",
     });
   }
   return result;
@@ -181,6 +202,77 @@ export class UpdateService {
   private value: UpdateStatus;
   private pending?: Promise<UpdateStatus>;
   private verifiedRelease?: string;
+  private retryAfter = 0;
+  private failures = 0;
+  private controller?: AbortController;
+  dispose() {
+    this.controller?.abort();
+  }
+  private listeners = new Set<(status: UpdateStatus) => void>();
+  subscribe(listener: (status: UpdateStatus) => void) {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+  private publish() {
+    for (const listener of this.listeners) listener(this.status());
+  }
+  configure(automatic: boolean, includePreviews: boolean) {
+    if (this.pending)
+      throw Error("Wait for the current update check to finish.");
+    this.value = {
+      ...this.value,
+      automatic,
+      includePreviews,
+      channel: includePreviews
+        ? "Preview (alpha, beta, rc and stable)"
+        : "Stable",
+      state: "idle",
+      release: undefined,
+      message: "Update preferences saved for this device.",
+    };
+    this.verifiedRelease = undefined;
+    this.value.cached = false;
+    this.publish();
+  }
+  restorePublication(release: ReleaseInfo) {
+    const checked = releases([
+      {
+        tag_name: new URL(release.url).pathname.split("/").at(-1)
+          ? decodeURIComponent(new URL(release.url).pathname.split("/").at(-1)!)
+          : "",
+        name: release.name,
+        html_url: release.url,
+        published_at: release.publishedAt,
+        body: release.notes,
+        draft: false,
+        prerelease: !!parseVersion(release.version).prerelease.length,
+      },
+    ])[0];
+    if (checked.version !== release.version)
+      throw Error("Cached release mismatch");
+    if (
+      !this.value.includePreviews &&
+      parseVersion(checked.version).prerelease.length
+    )
+      return;
+    this.value.release = checked;
+    this.value.cached = true;
+    this.value.message =
+      "Saved publication metadata; the next successful check will refresh it.";
+    this.verifiedRelease = checked.url;
+  }
+  restoreRetryAt(value: number) {
+    if (Number.isFinite(value) && value > Date.now()) {
+      this.retryAfter = Math.min(value, Date.now() + 7 * 86400000);
+      this.value.retryAt = new Date(this.retryAfter).toISOString();
+    }
+  }
+  restoreLastSuccess(value: string) {
+    if (Number.isFinite(Date.parse(value)) && Date.parse(value) <= Date.now())
+      this.value.lastSuccess = value;
+  }
   constructor(
     private installedVersion: string,
     private provider: ReleaseProvider = officialProvider,
@@ -192,6 +284,11 @@ export class UpdateService {
     this.value = {
       state: provider.kind === "private-preview" ? "unavailable" : "idle",
       installedVersion,
+      automatic: true,
+      includePreviews: !!v.prerelease.length,
+      delivery: "blocked",
+      deliveryReason:
+        "Downloads and installation are disabled: no pinned publisher verification policy or validated Windows upgrade path exists. Review the official release page; metadata checks do not authenticate executables.",
       channel:
         provider.kind === "private-preview"
           ? v.prerelease.length
@@ -203,7 +300,7 @@ export class UpdateService {
       message:
         provider.kind === "private-preview"
           ? privateMessage
-          : "Updates are checked only when you request them.",
+          : "Official public releases will be checked in the background when enabled.",
     };
   }
   status(): UpdateStatus {
@@ -216,18 +313,32 @@ export class UpdateService {
     return this.verifiedRelease;
   }
   check(): Promise<UpdateStatus> {
-    return (this.pending ??= this.perform().finally(() => {
+    if (this.pending) return this.pending;
+    if (Date.now() < this.retryAfter) return Promise.resolve(this.status());
+    this.pending = this.perform().finally(() => {
       this.pending = undefined;
-    }));
+      this.publish();
+    });
+    this.publish();
+    return this.pending;
   }
   private async perform(): Promise<UpdateStatus> {
     const base = {
-      installedVersion: this.installedVersion,
+      ...this.value,
+      release: undefined,
+      cached: false,
       channel: this.value.channel,
       lastSuccess: this.value.lastSuccess,
     };
     const finish = (state: UpdateStatus["state"], message: string) => {
+      this.verifiedRelease = undefined;
       this.value = { ...base, state, message };
+      if (state === "error" || state === "offline") {
+        this.retryAfter =
+          Date.now() +
+          Math.min(86400000, 60000 * 2 ** Math.min(this.failures++, 10));
+        this.value.retryAt = new Date(this.retryAfter).toISOString();
+      }
       return this.status();
     };
     if (!this.online())
@@ -242,7 +353,13 @@ export class UpdateService {
         "error",
         "Update provider is not an authorized official repository.",
       );
+    this.value = {
+      ...base,
+      state: "checking",
+      message: "Checking official public release information…",
+    };
     const controller = new AbortController();
+    this.controller = controller;
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
@@ -270,20 +387,45 @@ export class UpdateService {
         );
       }
       if (response.status === 403 || response.status === 429) {
+        const retry = response.headers.get("retry-after");
+        const reset = response.headers.get("x-ratelimit-reset");
+        const retryTime =
+          retry && /^\d+$/.test(retry)
+            ? Date.now() + Number(retry) * 1000
+            : retry
+              ? Date.parse(retry)
+              : 0;
+        const resetTime =
+          reset && /^\d+$/.test(reset) ? Number(reset) * 1000 : 0;
+        this.retryAfter = Math.max(
+          Date.now() + 15 * 60000,
+          Number.isFinite(retryTime) ? retryTime : 0,
+          Number.isFinite(resetTime) ? resetTime : 0,
+        );
+        base.retryAt = new Date(
+          Math.min(this.retryAfter, 8640000000000000),
+        ).toISOString();
         await response.body?.cancel();
         return finish(
           "unavailable",
-          "The official service restricted this request or reached its rate limit. Try a manual check later.",
+          "The official service restricted this request or reached its rate limit. Checks will wait until the retry time shown.",
         );
       }
       if (!response.ok) {
         await response.body?.cancel();
         throw Error(`Official service returned HTTP ${response.status}.`);
       }
-      const available = releases(await boundedJson(response))
+      if (response.redirected)
+        throw Error("Redirected release metadata is not accepted.");
+      const parsedReleases = releases(await boundedJson(response));
+      this.failures = 0;
+      this.retryAfter = 0;
+      base.retryAt = undefined;
+      base.lastSuccess = new Date().toISOString();
+      const available = parsedReleases
         .filter(
           (r) =>
-            parseVersion(this.installedVersion).prerelease.length ||
+            this.value.includePreviews ||
             !parseVersion(r.version).prerelease.length,
         )
         .sort((a, b) => compareVersions(b.version, a.version));
@@ -293,6 +435,14 @@ export class UpdateService {
           "No published releases for this channel were returned. No latest version can be confirmed.",
         );
       const latest = available[0];
+      if (
+        parsedReleases.length === 20 &&
+        compareVersions(latest.version, this.installedVersion) <= 0
+      )
+        return finish(
+          "unavailable",
+          "The bounded release window is full. No newer version was found here, but current-version status cannot be confirmed. Review the official Releases page.",
+        );
       this.verifiedRelease = latest.url;
       this.value = {
         ...base,
@@ -303,7 +453,7 @@ export class UpdateService {
         message:
           compareVersions(latest.version, this.installedVersion) > 0
             ? "A newer official published version is available."
-            : "No newer published version was found in the official channel’s latest 20 releases.",
+            : "You’re up to date with the official channel’s checked publications (latest 20 entries).",
         lastSuccess: new Date().toISOString(),
         release: latest,
       };

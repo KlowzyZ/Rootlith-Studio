@@ -7,3 +7,5 @@ Windows packaging requires a trustworthy Windows host with the compiler/tooling 
 Legacy package name fixflow-studio, product filename FixFlow Studio, appId org.klowzy.fixflowstudio, installer GUID and %APPDATA%\fixflow-studio are deliberately retained. Changing public repository links must not migrate these identities. `npm run verify:identity` checks source-level invariants; it does not test installed Windows upgrades.
 
 The portable wrapper still stores data in the OS user profile. Uninstall retains user data. Before any binary release, verify standard-user install/uninstall, upgrade/data preservation, shortcuts, native diagnostics, wrapper components and corresponding source on Windows. Record exact source and executable hashes, notices and signing status. Byte-for-byte reproducibility is not claimed.
+
+The development server defaults to loopback (127.0.0.1). Explicit LAN development requires `npm run dev -- --host 0.0.0.0` and an intentional network-access decision. Electron main owns background update discovery; browser development mode does not simulate an installed updater. See [update behavior and future release workflow](updates.md).

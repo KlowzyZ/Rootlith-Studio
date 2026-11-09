@@ -14,6 +14,11 @@ export type ExportRequest = {
   type: "application/json" | "text/html";
 };
 export interface DesktopBridge {
+  updatePreferences(settings: {
+    automatic: boolean;
+    includePreviews: boolean;
+  }): Promise<UpdateStatus>;
+  onUpdateStatus(callback: (status: UpdateStatus) => void): () => void;
   updates(action: "status" | "check"): Promise<UpdateStatus>;
   openOfficialLink(kind: OfficialLink): Promise<void>;
   approve(w: Workflow): Promise<boolean>;

@@ -1,3 +1,7 @@
+import { Notification } from "electron";
+import { z } from "zod";
+import { UpdateController } from "../../packages/core/update-controller";
+import { loadUpdateState, saveUpdateState } from "./update-state";
 import { UpdateService } from "../../packages/core/updates";
 import { officialLink } from "../../packages/core/project";
 import { saveExport } from "./export-file";
@@ -73,7 +77,7 @@ function trusted(event: Electron.IpcMainInvokeEvent) {
 
 app
   .whenReady()
-  .then(() => {
+  .then(async () => {
     if (!locked) return;
     win = new BrowserWindow({
       width: 1540,
@@ -90,29 +94,80 @@ app
         sandbox: true,
       },
     });
-    const updates = new UpdateService(app.getVersion(), undefined, fetch, () =>
+    const updateStateFile = path.join(
+      app.getPath("userData"),
+      "update-preferences.json",
+    );
+    const service = new UpdateService(app.getVersion(), undefined, fetch, () =>
       net.isOnline(),
     );
+    const updates = new UpdateController(
+      service,
+      await loadUpdateState(updateStateFile, app.getVersion()),
+      (state) => saveUpdateState(updateStateFile, state),
+      (status) => {
+        if (!Notification.isSupported() || !status.release || win.isDestroyed())
+          return;
+        const notification = new Notification({
+          title: "Rootlith Studio update available",
+          body: `Version ${status.release.version} is published. Review it in Settings → Updates. No executable has been downloaded.`,
+        });
+        notification.on("click", () => {
+          if (!win.isDestroyed()) {
+            if (win.isMinimized()) win.restore();
+            win.show();
+            win.focus();
+          }
+        });
+        notification.show();
+      },
+      () => publishUpdateStatus(),
+    );
+    const updateStatus = () => ({
+      ...updates.status(),
+      runtime: {
+        platform: process.platform,
+        arch: process.arch,
+        electron: process.versions.electron,
+        chromium: process.versions.chrome,
+        packaged: app.isPackaged,
+        distribution: !app.isPackaged
+          ? ("source" as const)
+          : process.env.PORTABLE_EXECUTABLE_FILE
+            ? ("portable" as const)
+            : ("packaged-unverified" as const),
+      },
+    });
+    const publishUpdateStatus = () => {
+      if (!win.isDestroyed() && !win.webContents.isDestroyed())
+        win.webContents.send("update-status", updateStatus());
+    };
+    service.subscribe(publishUpdateStatus);
+    const updateSettings = z
+      .object({ automatic: z.boolean(), includePreviews: z.boolean() })
+      .strict();
+    ipcMain.handle("update-preferences", async (event, input: unknown) => {
+      trusted(event);
+      await updates.configure(updateSettings.parse(input));
+      publishUpdateStatus();
+      return updateStatus();
+    });
     ipcMain.handle("updates", async (event, action: unknown) => {
       trusted(event);
       if (action !== "status" && action !== "check")
         throw Error("Unsupported update action");
-      const result =
-        action === "check" ? await updates.check() : updates.status();
-      return {
-        ...result,
-        runtime: {
-          platform: process.platform,
-          arch: process.arch,
-          electron: process.versions.electron,
-          chromium: process.versions.chrome,
-          packaged: app.isPackaged,
-        },
-      };
+      if (action === "check") {
+        await updates.check();
+        publishUpdateStatus();
+      }
+      return updateStatus();
     });
+    // Only the trusted main process schedules background requests, after renderer load.
+    win.webContents.once("did-finish-load", () => updates.start());
+    app.once("before-quit", () => updates.stop());
     ipcMain.handle("open-official-link", async (event, kind: unknown) => {
       trusted(event);
-      await shell.openExternal(officialLink(kind, updates.releaseUrl()));
+      await shell.openExternal(officialLink(kind, service.releaseUrl()));
     });
     win.setMenuBarVisibility(false);
     win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));

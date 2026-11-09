@@ -1,5 +1,12 @@
 const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("fixflow", {
+  updatePreferences: (settings) =>
+    ipcRenderer.invoke("update-preferences", settings),
+  onUpdateStatus: (callback) => {
+    const listener = (_event, status) => callback(status);
+    ipcRenderer.on("update-status", listener);
+    return () => ipcRenderer.removeListener("update-status", listener);
+  },
   updates: (action) => ipcRenderer.invoke("updates", action),
   openOfficialLink: (kind) => ipcRenderer.invoke("open-official-link", kind),
   approve: (workflow) => ipcRenderer.invoke("approve", workflow),

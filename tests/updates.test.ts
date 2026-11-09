@@ -59,7 +59,7 @@ test("strict semver and prerelease precedence match release ordering without dow
 });
 test("private channel cannot query Drafts, claim latest or bundle authentication", async () => {
   const fetcher = transport([]);
-  const service = new UpdateService("0.13.0-alpha.1", undefined, fetcher);
+  const service = new UpdateService("0.13.0-alpha.1", { kind: "private-preview" }, fetcher);
   const state = await service.check();
   expect(state.state).toBe("unavailable");
   expect(state.lastSuccess).toBeUndefined();

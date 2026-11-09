@@ -2,4 +2,4 @@
 import { version } from "../../package.json";
 export const productName = "Rootlith Studio";
 export const productVersion = version;
-export const previewLabel = "Private integrated development preview · source review";
+export const previewLabel = "Public alpha · source review";

@@ -16,15 +16,22 @@ import {
   type OfficialLink,
   repositoryUrl,
 } from "../core/project";
-import { UpdateService, type UpdateStatus } from "../core/updates";
+import type { UpdateStatus } from "../core/updates";
 import { useDialog } from "./useDialog";
 import "./settings.css";
-const browserUpdates = new UpdateService(
-  productVersion,
-  undefined,
-  fetch,
-  () => navigator.onLine,
-);
+// Browser development mode never starts an independent renderer update client.
+const browserStatus: UpdateStatus = {
+  installedVersion: productVersion,
+  channel: "Browser development",
+  includePreviews: false,
+  delivery: "blocked",
+  deliveryReason:
+    "Executable delivery requires a native application, publisher authentication and Windows upgrade validation.",
+  automatic: false,
+  state: "unavailable",
+  message:
+    "Browser development mode has no native update service. Use the official Releases page to review publications.",
+};
 const panes = [
   ["general", "General", SlidersHorizontal],
   ["updates", "Updates", RefreshCw],
@@ -103,10 +110,10 @@ export function SettingsPage({
   renderData: () => ReactNode;
 }) {
   const [pane, setPane] = useState<Pane>("general");
-  const [status, setStatus] = useState<UpdateStatus>(() =>
-    browserUpdates.status(),
-  );
+  const [status, setStatus] = useState<UpdateStatus>(() => browserStatus);
   const [checking, setChecking] = useState(false);
+  const [savingPreferences, setSavingPreferences] = useState(false);
+  const [preferenceError, setPreferenceError] = useState("");
   const [linkError, setLinkError] = useState("");
   const [notices, setNotices] = useState<"license" | "notices">();
   const alive = useRef(true);
@@ -134,17 +141,19 @@ export function SettingsPage({
                 "The native update service is unavailable. No remote check was performed.",
             }));
         });
+    const unsubscribe = window.fixflow?.onUpdateStatus((next) => {
+      if (alive.current) setStatus(next);
+    });
     return () => {
+      unsubscribe?.();
       alive.current = false;
     };
   }, []);
   async function check() {
-    if (checking) return;
+    if (checking || status.state === "checking" || !window.fixflow) return;
     setChecking(true);
     try {
-      const s = window.fixflow
-        ? await window.fixflow.updates("check")
-        : await browserUpdates.check();
+      const s = await window.fixflow.updates("check");
       if (alive.current) setStatus(s);
     } catch {
       if (alive.current)
@@ -156,6 +165,25 @@ export function SettingsPage({
         }));
     } finally {
       if (alive.current) setChecking(false);
+    }
+  }
+  async function preferences(automatic: boolean, includePreviews: boolean) {
+    if (!window.fixflow || savingPreferences) return;
+    setSavingPreferences(true);
+    setPreferenceError("");
+    try {
+      const next = await window.fixflow.updatePreferences({
+        automatic,
+        includePreviews,
+      });
+      if (alive.current) setStatus(next);
+    } catch {
+      if (alive.current)
+        setPreferenceError(
+          "Update preferences could not be saved. Wait for any current check to finish, then try again.",
+        );
+    } finally {
+      if (alive.current) setSavingPreferences(false);
     }
   }
   async function link(kind: OfficialLink) {
@@ -290,9 +318,9 @@ export function SettingsPage({
               <div className="settings-note">
                 <ShieldCheck size={18} />
                 <p>
-                  No background update checks, automatic downloads or
-                  installations. Diagnostic checks still require your explicit
-                  approval.
+                  Background release checks can be controlled in Updates. No
+                  executable downloads or installations are enabled. Diagnostic
+                  checks still require your explicit approval.
                 </p>
               </div>
             </>
@@ -305,6 +333,61 @@ export function SettingsPage({
                   Know which build you’re using, and where updates can come
                   from.
                 </p>
+              </div>
+              <div className="preference-row">
+                <div>
+                  <strong>Automatically check for updates</strong>
+                  <p>
+                    Check after startup and about every 24 hours. No downloads
+                    or installation.
+                  </p>
+                </div>
+                <label className="settings-switch">
+                  <input
+                    type="checkbox"
+                    aria-label="Automatically check for updates"
+                    checked={status.automatic}
+                    disabled={
+                      !window.fixflow ||
+                      savingPreferences ||
+                      checking ||
+                      status.state === "checking"
+                    }
+                    onChange={(event) =>
+                      void preferences(
+                        event.target.checked,
+                        status.includePreviews,
+                      )
+                    }
+                  />
+                  {status.automatic ? "On" : "Off"}
+                </label>
+              </div>
+              <div className="preference-row">
+                <div>
+                  <strong>Include preview releases</strong>
+                  <p>
+                    Include alpha, beta and release candidates. Stable builds
+                    start with this off.
+                  </p>
+                </div>
+                <label className="settings-switch">
+                  <input
+                    type="checkbox"
+                    aria-label="Include preview releases"
+                    checked={status.includePreviews}
+                    disabled={
+                      !window.fixflow ||
+                      savingPreferences ||
+                      checking ||
+                      status.state === "checking"
+                    }
+                    onChange={(event) =>
+                      void preferences(status.automatic, event.target.checked)
+                    }
+                  />
+                  {status.includePreviews ? "On" : "Off"}
+                </label>
               </div>
               <dl className="settings-facts">
                 <div>
@@ -327,9 +410,9 @@ export function SettingsPage({
               <div
                 className={`update-state ${status.state}`}
                 aria-live="polite"
-                aria-busy={checking}
+                aria-busy={checking || status.state === "checking"}
               >
-                {checking ? (
+                {checking || status.state === "checking" ? (
                   <RefreshCw size={20} />
                 ) : status.state === "up-to-date" ? (
                   <Check size={20} />
@@ -338,25 +421,28 @@ export function SettingsPage({
                 )}
                 <div>
                   <strong>
-                    {checking
+                    {checking || status.state === "checking"
                       ? "Checking official release information…"
                       : {
-                          idle: "Ready when you are",
+                          idle: "Ready to check",
+                          checking: "Checking official release information…",
                           available: "Update available",
-                          "up-to-date": "No newer published version found",
+                          "up-to-date": "You’re up to date",
                           unavailable: "Update checking unavailable",
                           error: "Update check could not finish",
                           offline: "Device is offline",
                         }[status.state]}
                   </strong>
                   <p>
-                    {checking
-                      ? "Manual check only. No files will be downloaded or installed."
+                    {checking || status.state === "checking"
+                      ? "Contacting the official public repository. No executable files will be downloaded or installed."
                       : status.message}
                   </p>
                   {status.release && !checking && (
                     <p>
-                      Latest verified publication:{" "}
+                      {status.cached
+                        ? "Saved publication metadata (not a fresh check):"
+                        : "Publication metadata:"}{" "}
                       <strong>{status.release.version}</strong> ·{" "}
                       {new Date(
                         status.release.publishedAt,
@@ -369,7 +455,9 @@ export function SettingsPage({
                 <button
                   className="primary"
                   onClick={() => void check()}
-                  disabled={checking}
+                  disabled={
+                    checking || status.state === "checking" || !window.fixflow
+                  }
                 >
                   <RefreshCw size={15} />
                   Check for Updates
@@ -381,11 +469,39 @@ export function SettingsPage({
                   </button>
                 )}
               </div>
-              <p className="settings-footnote">
-                Private Drafts are not public downloads. This preview embeds no
-                GitHub token or update secret. Public GitHub release support is
-                implemented, but is not enabled for this private channel.
-              </p>
+              <button
+                onClick={() => void link("releases")}
+                className="settings-link"
+              >
+                Official GitHub Releases <ArrowUpRight size={14} />
+              </button>
+              {status.release?.notes && (
+                <details className="update-notes">
+                  <summary>Release notes — {status.release.version}</summary>
+                  <pre>{status.release.notes}</pre>
+                </details>
+              )}
+              {status.retryAt && (
+                <p className="settings-footnote">
+                  Retry after {new Date(status.retryAt).toLocaleString()}.
+                  Repeated clicks do not bypass rate limits.
+                </p>
+              )}
+              {status.runtime && (
+                <p className="settings-footnote">
+                  Build mode:{" "}
+                  {status.runtime.distribution === "source"
+                    ? "Development/source build — not an official installed release"
+                    : status.runtime.distribution === "portable"
+                      ? "Portable — replacement requires a verified download and closing the running application"
+                      : "Packaged build — installer provenance has not been verified"}
+                  .
+                </p>
+              )}
+              <p className="settings-footnote">{status.deliveryReason}</p>
+              {(preferenceError || status.persistenceError) && (
+                <p role="alert">{preferenceError || status.persistenceError}</p>
+              )}
             </>
           )}
           {pane === "data" && (
@@ -416,7 +532,7 @@ export function SettingsPage({
                   <h3>Rootlith Studio</h3>
                   <p>Clarity for every investigation.</p>
                   <span className="about-preview">
-                    Private alpha preview · {status.installedVersion}
+                    Public alpha · {status.installedVersion}
                   </span>
                 </div>
               </div>
