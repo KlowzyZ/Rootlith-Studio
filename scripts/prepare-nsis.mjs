@@ -45,5 +45,21 @@ for (const [before, after] of substitutions) {
 await writeFile(commonPath, commonMarker + common);
 console.log("Prepared installer/portable display names without changing legacy file/install identifiers.");
 
+// The locked builder enables its updater elevation helper for portable by default.
+// PortableOptions has no packElevateHelper setting, and this app has no executable updater.
+const helperPath = "node_modules/app-builder-lib/out/targets/nsis/nsisUtil.js";
+const helperMarker = "// Rootlith Studio: omit the elevation helper from portable.\n";
+const helperOriginal = 'if (!target.packager.info.framework.isCopyElevateHelper) {';
+const helperReplacement = 'if (target.name === "portable" || !target.packager.info.framework.isCopyElevateHelper) {';
+let helper = (await readFile(helperPath, "utf8")).replaceAll("\r\n", "\n");
+if (helper.startsWith(helperMarker)) {
+  helper = helper.slice(helperMarker.length).replace(helperReplacement, helperOriginal);
+}
+if (hash(helper) !== "a7871927187ecae39eb233d14c8341d854a2962de3664d55c2df5021b8aeead0")
+  throw Error("Unreviewed electron-builder elevation helper source");
+if (helper.split(helperOriginal).length !== 2) throw Error("Unexpected elevation helper guard count");
+await writeFile(helperPath, helperMarker + helper.replace(helperOriginal, helperReplacement));
+console.log("Excluded the updater elevation helper from the portable payload.");
+
 // Prepare PE/NSIS version display resources before electron-builder resource editing/signing.
 await (await import('./prepare-windows-branding.mjs')).prepareWindowsBranding();
