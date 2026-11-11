@@ -75,7 +75,7 @@ The official **v0.13.0-alpha.1** GitHub [pre-release](https://github.com/KlowzyZ
 | **Windows x64 Portable** | [Portable EXE](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/Rootlith-Studio-0.13.0-alpha.1-x64-portable.exe) | Experimental, no installation; shares the existing user profile |
 | **Integrity checks** | [SHA256SUMS.txt](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/SHA256SUMS.txt) | Compare downloaded file hashes with the published values; checksums alone do **not** authenticate the publisher |
 
-Both EXEs are **unsigned**. The portable edition is **not isolated** from an existing FixFlow/Rootlith profile in `%APPDATA%\\fixflow-studio`. Do not use it with personal workspaces you cannot afford to lose. See the [release notes](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1) for known limits and [Windows validation](docs/windows-validation.md) for the unfinished native-acceptance procedure.
+Both EXEs are **unsigned**. The portable edition is **not isolated** from an existing FixFlow/Rootlith profile in `%APPDATA%\fixflow-studio`. Do not use it with personal workspaces you cannot afford to lose. See the [release notes](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1) for known limits and [Windows validation](docs/windows-validation.md) for the unfinished native-acceptance procedure.
 
 ## 🚀 Quick start
 
