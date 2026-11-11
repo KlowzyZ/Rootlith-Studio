@@ -44,6 +44,8 @@ export async function verifyWindowsPackage(output = 'release') {
   for (const file of ['FixFlow Studio.exe', 'LICENSE.electron.txt', 'LICENSES.chromium.html']) {
     assert((await stat(path.join(unpacked, file))).size > 0, `Missing ${file}`);
   }
+  const resources = await readdir(path.join(unpacked, 'resources'));
+  assert(!resources.some(name => name.toLowerCase() === 'elevate.exe'), 'Unexpected updater elevation helper in application payload');
   const asar = path.join(unpacked, 'resources', 'app.asar');
   const bundled = JSON.parse(extractFile(asar, 'package.json'));
   assert.equal(bundled.name, 'fixflow-studio');
@@ -63,7 +65,7 @@ export async function verifyWindowsPackage(output = 'release') {
   }
   const report = {
     format: 1, version: pkg.version, artifacts,
-    checked: ['unpacked application identity and exact built JS', 'unpacked legal source hashes and notices', 'setup/portable presence and hashes'],
+    checked: ['unpacked application identity and exact built JS', 'no unpacked updater elevation helper', 'unpacked legal source hashes and notices', 'setup/portable presence and hashes'],
     unverified: ['embedded wrapper/component inventory', 'each wrapper extraction matches unpacked payload', 'Authenticode publisher trust', 'native launch/install/upgrade/uninstall/portable acceptance'],
   };
   await writeFile(path.join(output, 'PACKAGE_CONTENTS.json'), JSON.stringify(report, null, 2) + '\n');
