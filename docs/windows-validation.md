@@ -41,7 +41,7 @@ Snapshots include durable storage/recovery files and update preferences, excludi
 
 ## Upgrade, restart and uninstall
 
-A historical upgrade requires a trustworthy prior installer with provenance, source commit and checksum. There are currently no public Releases. **Historical upgrade is blocked until such an installer exists.** Do not use old private Draft binaries. Reinstalling the same candidate can test same-version behavior, but must be labelled separately and cannot pass the historical-upgrade gate.
+A historical upgrade requires a trustworthy prior installer with provenance, source commit and checksum. The first public unsigned **v0.13.0-alpha.1** pre-release now exists, but its native install/upgrade behavior is unverified. It may be evaluated as a prior build for a future version **only after independent verification in an isolated Windows test environment**; it cannot prove an upgrade to itself. Do not use old private Draft binaries. Reinstalling the same candidate tests same-version behavior only.
 
 With the app closed, run the candidate setup over the trustworthy prior install (or same candidate in a separate labelled test). Before launching, capture:
 
@@ -65,4 +65,4 @@ In the actual packaged builds, verify startup check after about 20 seconds; dail
 
 No binary download, verification or installation capability is implemented. The planned maintained NSIS path is electron-updater with independently verified publisher identity and signature verification left enabled; re-review the current version before adoption. A SHA-256 beside an EXE on GitHub is integrity evidence, not publisher authentication. Signing identity/key, authenticated metadata and native safe-time restart/upgrade evidence are required before enabling delivery. See [updates.md](updates.md).
 
-Before distribution, review all evidence with every gate explicitly pass/fail/blocked; pin the final source commit and SHA-256 values. Resolve wrapper/legal/signing, historical upgrade and all native acceptance gaps. Obtain explicit owner approval to publish signed artifacts. Neither this PR nor a merge authorizes public distribution.
+Before a future stable release or authenticated executable delivery, review every gate as pass/fail/blocked; pin the exact source commit and executable SHA-256 values. Resolve signing, historical upgrade and native acceptance gaps and obtain explicit owner approval. The experimental, unsigned v0.13.0-alpha.1 public pre-release was published with these limits disclosed; it does not retroactively satisfy those gates. This document itself does not authorize further publication.
