@@ -67,13 +67,13 @@ flowchart LR
 
 ## ⬇️ Download the Windows alpha
 
-The official **v0.13.0-alpha.1** GitHub [pre-release](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1) includes:
+The official **v0.13.0-alpha.1** Windows alpha is available from the [GitHub Releases page](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1). Open the release page and choose the file you want under **Assets**:
 
-| Edition | Download | Notes |
+| Edition | Asset to look for | Notes |
 | :--- | :--- | :--- |
-| **Windows x64 Installer** | [Setup EXE](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/Rootlith-Studio-0.13.0-alpha.1-x64-setup.exe) | Experimental per-user installer; native installation not yet verified |
-| **Windows x64 Portable** | [Portable EXE](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/Rootlith-Studio-0.13.0-alpha.1-x64-portable.exe) | Experimental, no installation; shares the existing user profile |
-| **Integrity checks** | [SHA256SUMS.txt](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/SHA256SUMS.txt) | Compare downloaded file hashes with the published values; checksums alone do **not** authenticate the publisher |
+| **Windows x64 Installer** | `Rootlith-Studio-0.13.0-alpha.1-x64-setup.exe` | Experimental per-user installer; native installation not yet verified |
+| **Windows x64 Portable** | `Rootlith-Studio-0.13.0-alpha.1-x64-portable.exe` | Experimental, no installation; shares the existing user profile |
+| **Integrity checks** | `SHA256SUMS.txt` | Compare the downloaded file's SHA-256 with the published value; checksums alone do **not** authenticate the publisher |
 
 Both EXEs are **unsigned**. The portable edition is **not isolated** from an existing FixFlow/Rootlith profile in `%APPDATA%\fixflow-studio`. Do not use it with personal workspaces you cannot afford to lose. See the [release notes](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1) for known limits and [Windows validation](docs/windows-validation.md) for the unfinished native-acceptance procedure.
 
