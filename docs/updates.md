@@ -1,6 +1,6 @@
 # Public update discovery and gated Windows delivery
 
-Rootlith reads only published release metadata from `KlowzyZ/Rootlith-Studio` over HTTPS, without credentials. Private Drafts and other repositories are never update feeds. There are currently no published binary releases: an empty list reports **unavailable**, never “up to date”. Metadata discovery does not authenticate an executable or authorize installation.
+Rootlith reads only published release metadata from `KlowzyZ/Rootlith-Studio` over HTTPS, without credentials. Private Drafts and other repositories are never update feeds. The first public experimental, unsigned Windows pre-release is [v0.13.0-alpha.1](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1). An empty release list reports **unavailable**, never “up to date”. Metadata discovery does not authenticate an executable or authorize installation.
 
 ## Current behavior
 
@@ -24,7 +24,7 @@ Registry/source review identified electron-updater 6.8.11 and its NSIS publisher
 
 ## Future publication workflow and activation gates
 
-Use GitHub Releases in this repository; do not create a new release repository. Public PR source checks remain read-only and have no packaging/signing credentials. Follow this order for a separately approved binary release:
+Use GitHub Releases in this repository; do not create a new release repository. Public PR source checks remain read-only and have no packaging/signing credentials. Follow this order for a future **signed, publisher-authenticated delivery/upgrade** release. The existing manual-download alpha is a separate, explicitly unsigned experiment and does not satisfy these gates:
 
 1. Review and merge a public PR via Main-Protection and successful `checks`. Pin the approved full commit and lockfile. Do not execute fork code in `pull_request_target`, credentialed jobs or self-hosted runners. Import source into private delivery only through a separate vetted intake with exact source hashes; no automatic public-to-private trigger.
 2. On disposable Windows infrastructure without release credentials, build the pinned source and verify legacy appId `org.klowzy.fixflowstudio`, package/product filename, NSIS GUID `c41b684f-fd57-5c09-b4a7-68101139f192`, per-user/no-elevation policy and `%APPDATA%\fixflow-studio`. Preserve all installer identities. Run install/upgrade/uninstall, pending-write/recovery and portable coexistence tests against synthetic data. No destructive migration or reset.

@@ -10,12 +10,13 @@
   <p>
     <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-207A65?style=for-the-badge"></a>
     <img alt="Windows desktop" src="https://img.shields.io/badge/Platform-Windows-3974BE?style=for-the-badge">
-    <img alt="Alpha source" src="https://img.shields.io/badge/Status-Alpha-826CC5?style=for-the-badge">
+    <img alt="Alpha pre-release" src="https://img.shields.io/badge/Status-Alpha-826CC5?style=for-the-badge">
     <img alt="Local-first" src="https://img.shields.io/badge/Privacy-Local--first-4D7E74?style=for-the-badge">
   </p>
 
   <p>
-    <a href="#-quick-start"><strong>Explore the source</strong></a> &nbsp;·&nbsp;
+    <a href="https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1"><strong>Download Windows alpha</strong></a> &nbsp;·&nbsp;
+    <a href="#-quick-start"><strong>Build from source</strong></a> &nbsp;·&nbsp;
     <a href="#-what-you-can-do"><strong>Features</strong></a> &nbsp;·&nbsp;
     <a href="#-contribute"><strong>Contribute</strong></a> &nbsp;·&nbsp;
     <a href="https://klowzy.com"><strong>KLOWZY</strong></a>
@@ -62,11 +63,23 @@ flowchart LR
 - **Honest limits:** a read-only request can still be logged, consume resources, or interact with a sensitive service. Only investigate systems you own or are authorized to test.
 
 > [!IMPORTANT]
-> **Current release state: v0.13.0-alpha.1 source preview.** This repository is intended for collaboration and review. It does **not** yet provide a publicly validated Windows Installer or Portable release. Linux/browser build success does not establish Windows-native upgrade or packaging safety. Automatic and manual public release checks are available in Electron Settings. Executable download/install stays disabled until publisher signing and native Windows upgrade validation are established; see [Updates](docs/updates.md).
+> **Current release: v0.13.0-alpha.1 — experimental, unsigned Windows pre-release.** The official GitHub release provides a Windows x64 Installer and Portable EXE. Both passed static package, component, legal and checksum verification; **native launch, installation and upgrade tests on these exact EXEs were not run**. Windows may display SmartScreen or publisher warnings because the files are not Authenticode-signed. Do not rely on this alpha for critical work or irreplaceable case data. Release discovery is available in Electron Settings, but executable download and automatic installation remain disabled; see [Updates](docs/updates.md).
+
+## ⬇️ Download the Windows alpha
+
+The official **v0.13.0-alpha.1** GitHub [pre-release](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1) includes:
+
+| Edition | Download | Notes |
+| :--- | :--- | :--- |
+| **Windows x64 Installer** | [Setup EXE](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/Rootlith-Studio-0.13.0-alpha.1-x64-setup.exe) | Experimental per-user installer; native installation not yet verified |
+| **Windows x64 Portable** | [Portable EXE](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/Rootlith-Studio-0.13.0-alpha.1-x64-portable.exe) | Experimental, no installation; shares the existing user profile |
+| **Integrity checks** | [SHA256SUMS.txt](https://github.com/KlowzyZ/Rootlith-Studio/releases/download/v0.13.0-alpha.1/SHA256SUMS.txt) | Compare downloaded file hashes with the published values; checksums alone do **not** authenticate the publisher |
+
+Both EXEs are **unsigned**. The portable edition is **not isolated** from an existing FixFlow/Rootlith profile in `%APPDATA%\fixflow-studio`. Do not use it with personal workspaces you cannot afford to lose. See the [release notes](https://github.com/KlowzyZ/Rootlith-Studio/releases/tag/v0.13.0-alpha.1) for known limits and [Windows validation](docs/windows-validation.md) for the unfinished native-acceptance procedure.
 
 ## 🚀 Quick start
 
-**Requirements:** Node.js 24 LTS and npm. Windows is the intended native desktop platform; other environments can inspect the code and run the browser development experience.
+**To run from source:** Node.js 24 LTS and npm are required. Windows is the intended native desktop platform; other environments can inspect the code and run the browser development experience.
 
 ```bash
 git clone https://github.com/KlowzyZ/Rootlith-Studio.git
